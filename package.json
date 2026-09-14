@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "framer-motion": "^12.41.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.23"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0"
+  }
+}

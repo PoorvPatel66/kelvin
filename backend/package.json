@@ -1,0 +1,50 @@
+{
+  "name": "kelvin-eco-products-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node.js and Express API for Kelvin Eco Products.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.0",
+    "@prisma/client": "^7.9.0",
+    "bcryptjs": "latest",
+    "cloudinary": "^2.10.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "latest",
+    "cors": "latest",
+    "dotenv": "^17.4.2",
+    "express": "latest",
+    "express-rate-limit": "latest",
+    "express-validator": "latest",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "latest",
+    "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^2.2.1",
+    "nodemailer": "^9.0.1",
+    "pdfkit": "^0.19.1",
+    "pg": "^8.22.0",
+    "swagger-ui-express": "latest"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^30.0.0",
+    "nodemon": "latest",
+    "prisma": "^7.9.0",
+    "supertest": "^7.1.0"
+  }
+}

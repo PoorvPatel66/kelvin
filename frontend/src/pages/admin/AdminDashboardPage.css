@@ -1,0 +1,221 @@
+.admin-dashboard {
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.admin-dashboard__hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 28px;
+  border: 1px solid #e5e9e6;
+  border-radius: 28px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(14, 23, 18, 0.88), rgba(46, 125, 50, 0.76)),
+    url('/images/home/company.png') center/cover;
+  box-shadow: 0 18px 50px rgba(14, 23, 18, 0.08);
+  overflow: hidden;
+}
+
+.admin-dashboard__hero span {
+  color: #bfe8c2;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.admin-dashboard__hero h2 {
+  max-width: 860px;
+  margin: 10px 0 0;
+  font-size: clamp(2rem, 4vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.admin-dashboard__loading {
+  padding: 24px;
+  border: 1px solid #e5e9e6;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.admin-dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-dashboard__stat,
+.admin-dashboard__panel {
+  border: 1px solid #e5e9e6;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(14, 23, 18, 0.08);
+}
+
+.admin-dashboard__stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+}
+
+.admin-dashboard__stat > span {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #2e7d32;
+  background: #e8f5e9;
+}
+
+.admin-dashboard__stat p,
+.admin-dashboard__stat strong {
+  display: block;
+  margin: 0;
+}
+
+.admin-dashboard__stat p {
+  color: #6b726e;
+  font-weight: 800;
+}
+
+.admin-dashboard__stat strong {
+  margin-top: 2px;
+  color: #161b18;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.admin-dashboard__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.admin-dashboard__lists {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-dashboard__panel {
+  padding: 20px;
+}
+
+.admin-dashboard__panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-dashboard__panel h3 {
+  margin: 0;
+  color: #161b18;
+}
+
+.admin-dashboard__panel p {
+  margin: 4px 0 0;
+}
+
+.admin-dashboard__muted {
+  color: #6b726e;
+  line-height: 1.55;
+}
+
+.admin-dashboard__chart {
+  min-height: 240px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.admin-dashboard__bar {
+  flex: 1;
+  min-width: 32px;
+  height: 220px;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 7px;
+  text-align: center;
+  color: #6b726e;
+  font-weight: 800;
+}
+
+.admin-dashboard__bar span {
+  align-self: end;
+  display: block;
+  border-radius: 999px 999px 8px 8px;
+  background: linear-gradient(180deg, #76b82a, #2e7d32);
+}
+
+.admin-dashboard__big-number {
+  display: block;
+  color: #161b18;
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.admin-dashboard__list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-dashboard__list-item {
+  padding: 12px;
+  border: 1px solid #edf0ee;
+  border-radius: 16px;
+  background: #fbfcfb;
+}
+
+.admin-dashboard__list-item strong,
+.admin-dashboard__list-item span {
+  display: block;
+}
+
+.admin-dashboard__list-item span {
+  margin-top: 4px;
+  color: #6b726e;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+@media (max-width: 1100px) {
+  .admin-dashboard__stats,
+  .admin-dashboard__lists {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-dashboard__hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-dashboard__stats,
+  .admin-dashboard__lists {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard__chart {
+    overflow-x: auto;
+  }
+
+  .admin-dashboard__bar {
+    flex: 0 0 42px;
+  }
+}

@@ -1,0 +1,50 @@
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.admin-page-header__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #2e7d32;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-page-header h2 {
+  margin: 0;
+  color: #161b18;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  line-height: 1;
+}
+
+.admin-page-header p {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: #6b726e;
+  line-height: 1.65;
+}
+
+.admin-page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-page-header__actions,
+  .admin-page-header__actions > * {
+    width: 100%;
+  }
+}

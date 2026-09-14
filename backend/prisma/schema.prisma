@@ -1,0 +1,728 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CONTENT_MANAGER
+  SALES_MANAGER
+  SEO_MANAGER
+  VIEWER
+}
+
+enum CatalogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  LEAD
+  QUOTE
+  SYSTEM
+}
+
+enum BackupStatus {
+  PENDING
+  COMPLETE
+  FAILED
+}
+
+enum InquiryStatus {
+  NEW
+  OPEN
+  REPLIED
+  CLOSED
+}
+
+enum InquiryType {
+  CONTACT
+  REQUEST_QUOTE
+  NEWSLETTER
+  BROCHURE_DOWNLOAD
+  WHATSAPP
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum CustomerSource {
+  CONTACT
+  REQUEST_QUOTE
+  NEWSLETTER
+  BROCHURE_DOWNLOAD
+  WHATSAPP
+  MANUAL
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+enum MediaType {
+  HERO_BANNER
+  ABOUT_IMAGE
+  DOWNLOAD
+  BLOG_THUMBNAIL
+  BLOG_COVER
+  CERTIFICATE_ICON
+  COUNTRY_FLAG
+}
+
+enum BlogStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NavigationArea {
+  HEADER
+  FOOTER_QUICK
+  FOOTER_MORE
+  FOOTER_SERVICES
+}
+
+enum BlogContentFormat {
+  MARKDOWN
+  RICH_TEXT
+}
+
+model Admin {
+  id                  String    @id @default(uuid()) @db.Uuid
+  name                String
+  email               String    @unique
+  mobile              String?   @unique
+  password            String
+  role                Role      @default(ADMIN)
+  permissions         String[]  @default([])
+  isActive            Boolean   @default(true)
+  lastLoginAt         DateTime?
+  resetPasswordToken  String?
+  resetPasswordOtp    String?
+  resetPasswordExpire DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  blogs         Blog[]
+  otpChallenges AdminOtpChallenge[]
+  customerNotes CustomerNote[]
+  quotations    Quotation[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
+  backups       Backup[]
+
+  @@index([role])
+  @@index([isActive])
+  @@index([resetPasswordToken])
+  @@map("admins")
+}
+
+model AdminOtpChallenge {
+  id                String    @id @default(uuid()) @db.Uuid
+  adminId           String    @db.Uuid
+  mobile            String
+  otpHash           String
+  attempts          Int       @default(0)
+  maxAttempts       Int       @default(5)
+  expiresAt         DateTime
+  resendAvailableAt DateTime
+  consumedAt        DateTime?
+  createdAt         DateTime  @default(now())
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@index([mobile, consumedAt, expiresAt])
+  @@map("admin_otp_challenges")
+}
+
+model Category {
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String        @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int           @default(0)
+  parentId    String?       @db.Uuid
+  status      ProductStatus @default(ACTIVE)
+  isDeleted   Boolean       @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  products Product[]
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  @@index([status])
+  @@index([isDeleted])
+  @@index([parentId])
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+model Product {
+  id               String        @id @default(uuid()) @db.Uuid
+  name             String
+  slug             String        @unique
+  description      String
+  shortDescription String
+  specifications   Json?
+  moq              String?
+  material         String?
+  sizes            String[]
+  capacity         String?
+  usage            String?
+  seoTitle         String?
+  seoDescription   String?
+  seoKeywords      String[]      @default([])
+  canonicalUrl     String?
+  metaRobots       String?
+  ogImage          String?
+  status           ProductStatus @default(ACTIVE)
+  featured         Boolean       @default(false)
+  isDeleted        Boolean       @default(false)
+  deletedAt        DateTime?
+  categoryId       String        @db.Uuid
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  category       Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images         ProductImage[]
+  variants       ProductVariant[]
+  quotationItems QuotationItem[]
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([status])
+  @@index([isDeleted])
+  @@index([categoryId, featured])
+  @@index([status, isDeleted])
+  @@map("products")
+}
+
+model ProductVariant {
+  id             String        @id @default(uuid()) @db.Uuid
+  productId      String        @db.Uuid
+  name           String
+  sku            String?       @unique
+  size           String?
+  material       String?
+  color          String?
+  moq            String?
+  specifications Json?
+  status         ProductStatus @default(ACTIVE)
+  sortOrder      Int           @default(0)
+  isDeleted      Boolean       @default(false)
+  deletedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quotationItems QuotationItem[]
+
+  @@index([productId, status, isDeleted])
+  @@index([sortOrder])
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  url       String
+  publicId  String
+  productId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Blog {
+  id                 String            @id @default(uuid()) @db.Uuid
+  title              String
+  slug               String            @unique
+  excerpt            String
+  content            String
+  contentFormat      BlogContentFormat @default(MARKDOWN)
+  thumbnail          String?
+  thumbnailPublicId  String?
+  coverImage         String?
+  coverImagePublicId String?
+  featured           Boolean           @default(false)
+  status             BlogStatus        @default(DRAFT)
+  published          Boolean           @default(false)
+    publishedAt        DateTime?
+    scheduledAt        DateTime?
+  seoTitle           String?
+  seoDescription     String?
+  seoKeywords        String[]
+  canonicalUrl       String?
+  metaRobots         String?
+  ogImage            String?
+  tags               String[]
+  isDeleted          Boolean           @default(false)
+  deletedAt          DateTime?
+  categoryId         String?           @db.Uuid
+  adminId            String?           @db.Uuid
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  admin       Admin?               @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  category    BlogCategory?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  relatedFrom BlogRelatedArticle[] @relation("BlogRelatedFrom")
+  relatedTo   BlogRelatedArticle[] @relation("BlogRelatedTo")
+
+    @@index([published])
+    @@index([status])
+    @@index([scheduledAt])
+  @@index([featured])
+  @@index([isDeleted])
+  @@index([categoryId])
+  @@index([adminId])
+  @@map("blogs")
+}
+
+model BlogCategory {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String     @unique
+  description String?
+  status      BlogStatus @default(PUBLISHED)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  blogs Blog[]
+
+  @@index([status])
+  @@map("blog_categories")
+}
+
+model BlogRelatedArticle {
+  id        String   @id @default(uuid()) @db.Uuid
+  blogId    String   @db.Uuid
+  relatedId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  blog    Blog @relation("BlogRelatedFrom", fields: [blogId], references: [id], onDelete: Cascade)
+  related Blog @relation("BlogRelatedTo", fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@unique([blogId, relatedId])
+  @@index([blogId])
+  @@index([relatedId])
+  @@map("blog_related_articles")
+}
+
+model Inquiry {
+  id          String        @id @default(uuid()) @db.Uuid
+  type        InquiryType   @default(CONTACT)
+  name        String
+  company     String?
+  email       String
+  phone       String?
+  country     String?
+  product     String?
+  message     String?
+  status      InquiryStatus @default(NEW)
+  sourcePage  String?
+  brochureUrl String?
+  whatsappUrl String?
+  metadata    Json?
+  repliedAt   DateTime?
+  closedAt    DateTime?
+  customerId  String?       @db.Uuid
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  customer   Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  notes      InquiryNote[]
+  quotations Quotation[]
+
+  @@index([email])
+  @@index([status])
+  @@index([type])
+  @@index([product])
+  @@index([country])
+  @@index([createdAt])
+  @@index([customerId])
+  @@map("inquiries")
+}
+
+model InquiryNote {
+  id        String   @id @default(uuid()) @db.Uuid
+  message   String
+  inquiryId String   @db.Uuid
+  adminId   String?  @db.Uuid
+  createdAt DateTime @default(now())
+
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([inquiryId])
+  @@index([adminId])
+  @@map("inquiry_notes")
+}
+
+model Customer {
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String
+  company   String?
+  email     String         @unique
+  phone     String?
+  country   String?
+  status    CustomerStatus @default(LEAD)
+  source    CustomerSource @default(MANUAL)
+  isDeleted Boolean        @default(false)
+  deletedAt DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  inquiries  Inquiry[]
+  notes      CustomerNote[]
+  quotations Quotation[]
+
+  @@index([status])
+  @@index([source])
+  @@index([country])
+  @@index([company])
+  @@index([isDeleted])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+model Catalog {
+  id           String        @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String        @unique
+  description  String?
+  fileUrl      String
+  publicId     String?
+  thumbnailUrl String?
+  version      String?
+  status       CatalogStatus @default(DRAFT)
+  featured     Boolean       @default(false)
+  sortOrder    Int           @default(0)
+  publishedAt  DateTime?
+  isDeleted    Boolean       @default(false)
+  deletedAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([status, isDeleted, sortOrder])
+  @@index([featured])
+  @@map("catalogs")
+}
+
+model Quotation {
+  id              String          @id @default(uuid()) @db.Uuid
+  quotationNumber String          @unique
+  customerId      String          @db.Uuid
+  inquiryId       String?         @db.Uuid
+  createdById     String?         @db.Uuid
+  status          QuotationStatus @default(DRAFT)
+  currency        String          @default("INR")
+  subtotal        Decimal         @default(0) @db.Decimal(14, 2)
+  taxRate         Decimal         @default(0) @db.Decimal(5, 2)
+  taxAmount       Decimal         @default(0) @db.Decimal(14, 2)
+  discountAmount  Decimal         @default(0) @db.Decimal(14, 2)
+  totalAmount     Decimal         @default(0) @db.Decimal(14, 2)
+  validUntil      DateTime?
+  notes           String?
+  terms           String?
+  sentAt          DateTime?
+  acceptedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  customer  Customer        @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  inquiry   Inquiry?        @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  createdBy Admin?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  items     QuotationItem[]
+
+  @@index([customerId])
+  @@index([inquiryId])
+  @@index([createdById])
+  @@index([status, createdAt])
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  quotationId String   @db.Uuid
+  productId   String?  @db.Uuid
+  variantId   String?  @db.Uuid
+  name        String
+  description String?
+  quantity    Decimal  @db.Decimal(14, 2)
+  unitPrice   Decimal  @db.Decimal(14, 2)
+  lineTotal   Decimal  @db.Decimal(14, 2)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quotation Quotation       @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([quotationId, sortOrder])
+  @@index([productId])
+  @@index([variantId])
+  @@map("quotation_items")
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  adminId     String?  @db.Uuid
+  action      String
+  entityType  String
+  entityId    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([adminId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@map("activity_logs")
+}
+
+model Notification {
+  id         String           @id @default(uuid()) @db.Uuid
+  adminId    String?          @db.Uuid
+  type       NotificationType @default(INFO)
+  title      String
+  message    String
+  entityType String?
+  entityId   String?
+  actionUrl  String?
+  isRead     Boolean          @default(false)
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, isRead, createdAt])
+  @@index([entityType, entityId])
+  @@map("notifications")
+}
+
+model Backup {
+  id          String       @id @default(uuid()) @db.Uuid
+  label       String?
+  status      BackupStatus @default(PENDING)
+  snapshot    Json?
+  tableCounts Json?
+  error       String?
+  createdById String?      @db.Uuid
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+
+  createdBy Admin? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([createdById])
+  @@map("backups")
+}
+
+model CustomerNote {
+  id         String   @id @default(uuid()) @db.Uuid
+  message    String
+  customerId String   @db.Uuid
+  adminId    String?  @db.Uuid
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  admin    Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([customerId])
+  @@index([adminId])
+  @@map("customer_notes")
+}
+
+model ExportCountry {
+  id           String        @id @default(uuid()) @db.Uuid
+  countryName  String        @unique
+  flagUrl      String?
+  flagPublicId String?
+  status       ProductStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([status])
+  @@map("export_countries")
+}
+
+model Certification {
+  id                String        @id @default(uuid()) @db.Uuid
+  title             String        @unique
+  issuer            String?
+  certificateNumber String?
+  description       String
+  issueDate         DateTime?
+  expiryDate        DateTime?
+  icon              String?
+  iconPublicId      String?
+  pdfUrl            String?
+  status            ProductStatus @default(DRAFT)
+  sortOrder         Int           @default(0)
+  isDeleted         Boolean       @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([status])
+  @@index([isDeleted])
+  @@index([sortOrder])
+  @@map("certifications")
+}
+
+model MediaAsset {
+  id        String    @id @default(uuid()) @db.Uuid
+  type      MediaType
+  title     String?
+  url       String
+  publicId  String
+  folder    String
+  alt       String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([type])
+  @@index([publicId])
+  @@map("media_assets")
+}
+
+model WebsitePage {
+  id             String     @id @default(uuid()) @db.Uuid
+  title          String
+  slug           String     @unique
+  pageKey        String?    @unique
+  status         PageStatus @default(DRAFT)
+  excerpt        String?
+  content        String?
+  sections       Json?
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String[]   @default([])
+  canonicalUrl   String?
+  metaRobots     String?
+  ogImage        String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([status])
+  @@index([slug])
+  @@index([pageKey])
+  @@map("website_pages")
+}
+
+model SiteSetting {
+  id                String   @id @default("primary")
+  siteName          String   @default("Kelvin Eco Products")
+  tagline           String   @default("Think Green. Pack Smart.")
+  logoUrl           String?
+  footerDescription String?
+  primaryPhone      String?
+  alternatePhone    String?
+  primaryEmail      String?
+  alternateEmail    String?
+  websiteUrl        String?
+  whatsappNumber    String?
+  headOffice        String?
+  corporateOffice   String?
+  businessHours     String?
+  socialLinks       Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model NavigationItem {
+  id         String         @id @default(uuid()) @db.Uuid
+  label      String
+  path       String
+  area       NavigationArea
+  sortOrder  Int            @default(0)
+  isVisible  Boolean        @default(true)
+  isExternal Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([area, path])
+  @@index([area, isVisible, sortOrder])
+  @@map("navigation_items")
+}
+
+model Testimonial {
+  id        String        @id @default(uuid()) @db.Uuid
+  name      String
+  role      String?
+  company   String?
+  quote     String
+  sourceUrl String?
+  avatarUrl String?
+  rating    Int?
+  featured  Boolean       @default(false)
+  status    ProductStatus @default(ACTIVE)
+  sortOrder Int           @default(0)
+  isDeleted Boolean       @default(false)
+  deletedAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status, isDeleted, sortOrder])
+  @@index([featured])
+  @@map("testimonials")
+}
+
+model VisitorAnalytics {
+  id        String   @id @default(uuid()) @db.Uuid
+  path      String
+  country   String?
+  device    String?
+  source    String?
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@index([source])
+  @@map("visitor_analytics")
+}

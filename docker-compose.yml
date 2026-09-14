@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kelvin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kelvin
+      POSTGRES_PASSWORD: kelvin_password
+      POSTGRES_DB: kelvin_eco_products
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - kelvin_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelvin -d kelvin_eco_products"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kelvin_postgres_data:

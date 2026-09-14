@@ -1,0 +1,120 @@
+.admin-categories-page {
+  display: grid;
+  gap: 22px;
+}
+
+.admin-editor-card {
+  border: 1px solid #e5e9e6;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(14, 23, 18, 0.08);
+  padding: 22px;
+}
+
+.admin-editor-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-editor-card__header span {
+  display: block;
+  margin-bottom: 6px;
+  color: #2e7d32;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-editor-card__header h3 {
+  margin: 0;
+  color: #0f2d52;
+  font-size: clamp(1.3rem, 2vw, 1.9rem);
+}
+
+.admin-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e9e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f2d52;
+  cursor: pointer;
+}
+
+.admin-category-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-category-view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-category-form label {
+  display: grid;
+  gap: 7px;
+  color: #435047;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.admin-category-form input,
+.admin-category-form select,
+.admin-category-form textarea {
+  width: 100%;
+  border: 1px solid #d9e1db;
+  border-radius: 16px;
+  background: #f9fbf9;
+  color: #161b18;
+  font: inherit;
+  outline: 0;
+  padding: 12px 14px;
+}
+
+.admin-category-form textarea {
+  resize: vertical;
+}
+
+.admin-category-form input:focus,
+.admin-category-form select:focus,
+.admin-category-form textarea:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.12);
+}
+
+.admin-category-form__wide,
+.admin-category-form__actions {
+  grid-column: 1 / -1;
+}
+
+.admin-category-form__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-category-cell strong,
+.admin-category-cell span {
+  display: block;
+}
+
+.admin-category-cell span {
+  margin-top: 2px;
+  color: #6b726e;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .admin-category-form {
+    grid-template-columns: 1fr;
+  }
+}

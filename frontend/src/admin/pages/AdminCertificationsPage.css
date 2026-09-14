@@ -1,0 +1,23 @@
+.admin-certifications-page { display: grid; gap: 22px; }
+.admin-certifications-page .admin-editor-card { padding: 24px; border: 1px solid #e1e8e2; border-radius: 22px; background: #fff; box-shadow: 0 16px 36px rgba(15, 45, 82, .06); }
+.admin-certifications-page .admin-editor-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.admin-certifications-page .admin-editor-card__header span { color: #2e7d32; font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.admin-certifications-page .admin-editor-card__header h3 { margin: 5px 0 0; color: #0f2d52; font-size: 1.25rem; }
+.admin-certification-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.admin-certification-form label { display: grid; gap: 7px; color: #435047; font-size: .82rem; font-weight: 900; }
+.admin-certification-form input, .admin-certification-form select, .admin-certification-form textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9e1db; border-radius: 16px; outline: 0; background: #f9fbf9; color: #161b18; font: inherit; }
+.admin-certification-form textarea { resize: vertical; }
+.admin-certification-form input:focus, .admin-certification-form select:focus, .admin-certification-form textarea:focus { border-color: #2e7d32; box-shadow: 0 0 0 4px rgba(46, 125, 50, .12); }
+.admin-certification-form__wide, .admin-certification-form__actions { grid-column: 1 / -1; }
+.admin-certification-form__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.admin-certification-upload input { padding: 9px; }
+.admin-certification-upload small { color: #718079; font-weight: 600; }
+.admin-certification-preview { display: flex; align-items: center; gap: 12px; align-self: end; }
+.admin-certification-preview img { width: 72px; height: 72px; object-fit: contain; border: 1px solid #dce5de; border-radius: 12px; background: #f8faf7; }
+.admin-certifications-page .admin-icon-btn, .admin-certifications-page .admin-row-actions button { display: inline-grid; width: 36px; height: 36px; padding: 0; place-items: center; border: 1px solid #dce5de; border-radius: 10px; background: #fff; color: #0f2d52; cursor: pointer; }
+.admin-certifications-page .admin-row-actions { display: flex; gap: 8px; }
+.admin-certification-title { display: flex; align-items: center; gap: 10px; }
+.admin-certification-title > img, .admin-certification-title > span { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; object-fit: contain; border: 1px solid #dce5de; border-radius: 12px; background: #f8faf7; color: #2e7d32; }
+.admin-certification-title strong, .admin-certification-title small { display: block; }
+.admin-certification-title small { margin-top: 3px; color: #64748b; }
+@media (max-width: 900px) { .admin-certification-form { grid-template-columns: 1fr; } .admin-certification-preview { align-self: auto; } }

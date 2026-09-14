@@ -1,0 +1,37 @@
+.admin-empty {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  padding: 34px;
+  border: 1px dashed #d6ddd8;
+  border-radius: 22px;
+  background: #fbfcfb;
+}
+
+.admin-empty__icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.admin-empty h3 {
+  margin: 16px 0 6px;
+  color: #161b18;
+}
+
+.admin-empty p {
+  max-width: 480px;
+  margin: 0;
+  color: #6b726e;
+  line-height: 1.6;
+}
+
+.admin-empty__action {
+  margin-top: 18px;
+}
