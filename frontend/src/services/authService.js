@@ -48,3 +48,39 @@ export async function resetPassword(payload) {
   setStoredToken(token);
   return response.data;
 }
+
+export async function getAdminProfile() {
+  const response = await api.get('/admin/profile');
+  return response.data?.profile;
+}
+
+export async function updateAdminProfile(payload) {
+  const response = await api.patch('/admin/profile', payload);
+  return response.data;
+}
+
+export async function requestAdminEmailChange(email) {
+  const response = await api.post('/admin/profile/email/request', { email });
+  return response.data;
+}
+
+export async function verifyAdminEmailChange(payload) {
+  const response = await api.post('/admin/profile/email/verify', payload);
+  return response.data;
+}
+
+export async function requestAdminPhoneChange(phone) {
+  const response = await api.post('/admin/profile/phone/request', { phone });
+  return response.data;
+}
+
+export async function verifyAdminPhoneChange(payload) {
+  const response = await api.post('/admin/profile/phone/verify', payload);
+  return response.data;
+}
+
+export async function changeAdminPassword(payload) {
+  const response = await api.patch('/admin/profile/password', payload);
+  setStoredToken(response.data?.token);
+  return response.data;
+}

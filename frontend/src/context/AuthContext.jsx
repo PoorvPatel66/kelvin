@@ -63,6 +63,7 @@ export function AuthProvider({ children }) {
       admin,
       isAuthenticated: Boolean(admin),
       isBootstrapping,
+      updateAdmin: setAdmin,
       login,
       loginWithOwnerOtp,
       logout

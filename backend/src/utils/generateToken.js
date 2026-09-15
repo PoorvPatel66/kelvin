@@ -15,7 +15,8 @@ export function generateToken(admin) {
     {
       id: admin.id,
       email: admin.email,
-      role: admin.role
+      role: admin.role,
+      tokenVersion: admin.tokenVersion || 0
     },
     ensureJwtSecret(),
     {

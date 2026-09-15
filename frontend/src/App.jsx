@@ -31,6 +31,7 @@ const AdminProductsPage = lazy(() => import('./admin/pages/AdminProductsPage.jsx
 const AdminProductEditorPage = lazy(() => import('./admin/pages/AdminProductEditorPage.jsx'));
 const AdminBlogsPage = lazy(() => import('./admin/pages/AdminBlogsPage.jsx'));
 const AdminInquiriesPage = lazy(() => import('./admin/pages/AdminInquiriesPage.jsx'));
+const AdminProfilePage = lazy(() => import('./admin/pages/AdminProfilePage.jsx'));
 
 function App() {
   const location = useLocation();
@@ -124,6 +125,7 @@ function App() {
             <Route path="products/:id/edit" element={<ProtectedRoute allowedRoles={CATALOG_ROLES}><AdminProductEditorPage /></ProtectedRoute>} />
             <Route path="contact" element={<ProtectedRoute allowedRoles={SALES_ROLES}><AdminInquiriesPage type="CONTACT" title="Contact" description="Manage messages submitted from the public contact form." /></ProtectedRoute>} />
             <Route path="blog" element={<ProtectedRoute allowedRoles={CONTENT_ROLES}><AdminBlogsPage /></ProtectedRoute>} />
+            <Route path="profile" element={<AdminProfilePage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

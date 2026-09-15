@@ -28,3 +28,29 @@ export async function sendPasswordResetOtp(email, otp) {
 
   return true;
 }
+
+export async function sendAdminEmailVerificationOtp(email, otp, expiresInMinutes) {
+  if (process.env.NODE_ENV !== 'production' && process.env.ADMIN_OTP_DELIVERY_MODE === 'development') {
+    return { delivered: true, developmentOtp: otp };
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: required('SMTP_HOST'),
+    port: Number(required('SMTP_PORT')),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: required('SMTP_USER'),
+      pass: required('SMTP_PASS')
+    }
+  });
+
+  await transporter.sendMail({
+    from: required('SMTP_FROM'),
+    to: email,
+    subject: 'Kelvin Admin email verification code',
+    text: `Your Kelvin Admin email verification code is ${otp}. It expires in ${expiresInMinutes} minutes.`,
+    html: `<p>Your Kelvin Admin email verification code is <strong>${otp}</strong>.</p><p>It expires in ${expiresInMinutes} minutes.</p>`
+  });
+
+  return { delivered: true };
+}

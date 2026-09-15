@@ -20,6 +20,7 @@ function sanitizeAdmin(admin) {
     resetPasswordToken,
     resetPasswordOtp,
     resetPasswordExpire,
+    tokenVersion,
     ...safeAdmin
   } = admin;
   return safeAdmin;

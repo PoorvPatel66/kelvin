@@ -22,16 +22,21 @@ export const protect = asyncHandler(async (req, res, next) => {
       role: true,
       permissions: true,
       isActive: true,
+      tokenVersion: true,
+      mobile: true,
+      emailVerified: true,
+      phoneVerified: true,
       createdAt: true,
       updatedAt: true
     }
   });
 
-  if (!admin || !admin.isActive) {
+  if (!admin || !admin.isActive || (decoded.tokenVersion || 0) !== admin.tokenVersion) {
     throw new AppError('User is not authorized.', 401);
   }
 
-  req.user = admin;
+  const { tokenVersion, ...safeAdmin } = admin;
+  req.user = safeAdmin;
   next();
 });
 

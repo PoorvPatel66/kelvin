@@ -118,6 +118,11 @@ enum BlogContentFormat {
   RICH_TEXT
 }
 
+enum AdminVerificationType {
+  EMAIL
+  PHONE
+}
+
 model Admin {
   id                  String    @id @default(uuid()) @db.Uuid
   name                String
@@ -127,6 +132,9 @@ model Admin {
   role                Role      @default(ADMIN)
   permissions         String[]  @default([])
   isActive            Boolean   @default(true)
+  emailVerified       Boolean   @default(false)
+  phoneVerified       Boolean   @default(false)
+  tokenVersion        Int       @default(0)
   lastLoginAt         DateTime?
   resetPasswordToken  String?
   resetPasswordOtp    String?
@@ -136,6 +144,7 @@ model Admin {
 
   blogs         Blog[]
   otpChallenges AdminOtpChallenge[]
+  verificationChallenges AdminVerificationChallenge[]
   customerNotes CustomerNote[]
   quotations    Quotation[]
   activityLogs  ActivityLog[]
@@ -146,6 +155,26 @@ model Admin {
   @@index([isActive])
   @@index([resetPasswordToken])
   @@map("admins")
+}
+
+model AdminVerificationChallenge {
+  id                String                 @id @default(uuid()) @db.Uuid
+  adminId           String                 @db.Uuid
+  type              AdminVerificationType
+  target            String
+  otpHash           String
+  attempts          Int                    @default(0)
+  maxAttempts       Int                    @default(5)
+  expiresAt         DateTime
+  resendAvailableAt DateTime
+  consumedAt        DateTime?
+  createdAt         DateTime               @default(now())
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, type, createdAt])
+  @@index([target, type, consumedAt, expiresAt])
+  @@map("admin_verification_challenges")
 }
 
 model AdminOtpChallenge {
