@@ -1,5 +1,15 @@
 import jwt from 'jsonwebtoken';
 
+function ensureJwtSecret() {
+  const secret = process.env.JWT_SECRET?.trim();
+
+  if (!secret) {
+    throw new Error('JWT_SECRET is required for authenticated admin sessions.');
+  }
+
+  return secret;
+}
+
 export function generateToken(admin) {
   return jwt.sign(
     {
@@ -7,7 +17,7 @@ export function generateToken(admin) {
       email: admin.email,
       role: admin.role
     },
-    process.env.JWT_SECRET,
+    ensureJwtSecret(),
     {
       expiresIn: process.env.JWT_EXPIRE || '7d'
     }

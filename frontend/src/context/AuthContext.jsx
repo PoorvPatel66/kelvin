@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { getStoredToken } from '../services/api.js';
+import { getStoredToken, setStoredToken } from '../services/api.js';
 import { getCurrentAdmin, loginAdmin, logoutAdmin, verifyOwnerOtp } from '../services/authService.js';
 
 const AuthContext = createContext(null);
@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
       setAdmin(currentAdmin);
     } catch (error) {
       setAdmin(null);
+      setStoredToken(null);
     } finally {
       setIsBootstrapping(false);
     }

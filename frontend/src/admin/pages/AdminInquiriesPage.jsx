@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Download, MessageSquarePlus, RefreshCw, Send } from 'lucide-react';
+import { Download, Eye, MessageSquarePlus, RefreshCw, Send, Trash2, X } from 'lucide-react';
 import DataTable from '../components/DataTable.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import {
   addAdminInquiryNote,
+  deleteAdminInquiry,
   exportAdminInquiriesCsv,
+  fetchAdminInquiry,
   fetchAdminInquiries,
   resendAdminInquiryNotification,
   updateAdminInquiryStatus
@@ -41,6 +43,7 @@ function AdminInquiriesPage({
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [busyId, setBusyId] = useState('');
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
 
   const filters = useMemo(
     () => ({
@@ -127,6 +130,27 @@ function AdminInquiriesPage({
     }
   }
 
+  async function handleView(inquiry) {
+    try {
+      setSelectedInquiry(await fetchAdminInquiry(inquiry.id));
+    } catch (error) {
+      showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load inquiry.' });
+    }
+  }
+
+  async function handleDelete(inquiry) {
+    if (!window.confirm(`Delete the inquiry from "${inquiry.name}"?`)) return;
+
+    try {
+      await deleteAdminInquiry(inquiry.id);
+      setInquiries((current) => current.filter((item) => item.id !== inquiry.id));
+      setSelectedInquiry(null);
+      showToast({ type: 'success', message: 'Inquiry deleted.' });
+    } catch (error) {
+      showToast({ type: 'error', message: error.response?.data?.message || 'Unable to delete inquiry.' });
+    }
+  }
+
   async function handleExport() {
     try {
       const { page: _page, limit: _limit, ...exportFilters } = filters;
@@ -196,6 +220,9 @@ function AdminInquiriesPage({
         header: 'Actions',
         render: (inquiry) => (
           <div className="admin-row-actions">
+            <button type="button" onClick={() => handleView(inquiry)} aria-label={`View ${inquiry.name}`}>
+              <Eye size={16} />
+            </button>
             <button
               type="button"
               onClick={() => handleAddNote(inquiry)}
@@ -211,6 +238,9 @@ function AdminInquiriesPage({
               aria-label={`Resend notification for ${inquiry.name}`}
             >
               <Send size={16} />
+            </button>
+            <button type="button" onClick={() => handleDelete(inquiry)} aria-label={`Delete ${inquiry.name}`}>
+              <Trash2 size={16} />
             </button>
           </div>
         )
@@ -273,6 +303,21 @@ function AdminInquiriesPage({
         emptyTitle="No inquiries found"
         emptyDescription="New website inquiries will appear here after customers submit public forms."
       />
+
+      {selectedInquiry && (
+        <div className="admin-modal-backdrop" role="presentation" onClick={() => setSelectedInquiry(null)}>
+          <section className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="inquiry-detail-title" onClick={(event) => event.stopPropagation()}>
+            <button className="admin-icon-btn" type="button" onClick={() => setSelectedInquiry(null)} aria-label="Close inquiry details">
+              <X size={18} />
+            </button>
+            <h2 id="inquiry-detail-title">{selectedInquiry.name}</h2>
+            <p>{selectedInquiry.email}{selectedInquiry.phone ? ` | ${selectedInquiry.phone}` : ''}</p>
+            <p>{selectedInquiry.company || 'No company'}{selectedInquiry.country ? ` | ${selectedInquiry.country}` : ''}</p>
+            <p>{selectedInquiry.message || 'No message provided.'}</p>
+            <StatusBadge status={selectedInquiry.status} />
+          </section>
+        </div>
+      )}
     </main>
   );
 }

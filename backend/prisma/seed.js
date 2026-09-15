@@ -12,25 +12,35 @@ async function main() {
     throw new Error('OWNER_NAME, OWNER_PASSWORD, OWNER_ADMIN_EMAIL, and OWNER_MOBILE are required to seed the owner admin.');
   }
 
+  const existingOwner = await prisma.admin.findFirst({
+    where: {
+      OR: [{ email: ownerEmail }, { mobile: ownerMobile }]
+    },
+    select: { id: true }
+  });
   const password = await bcrypt.hash(ownerPassword, 12);
 
-  const admin = await prisma.admin.upsert({
-    where: { email: ownerEmail },
-    update: {
-      name: ownerName,
-      mobile: ownerMobile,
-      password,
-      role: Role.SUPER_ADMIN,
-      isActive: true
-    },
-    create: {
-      name: ownerName,
-      email: ownerEmail,
-      mobile: ownerMobile,
-      password,
-      role: Role.SUPER_ADMIN
-    }
-  });
+  const admin = existingOwner
+    ? await prisma.admin.update({
+        where: { id: existingOwner.id },
+        data: {
+          name: ownerName,
+          email: ownerEmail,
+          mobile: ownerMobile,
+          password,
+          role: Role.SUPER_ADMIN,
+          isActive: true
+        }
+      })
+    : await prisma.admin.create({
+        data: {
+          name: ownerName,
+          email: ownerEmail,
+          mobile: ownerMobile,
+          password,
+          role: Role.SUPER_ADMIN
+        }
+      });
 
   const categoryData = [
     {

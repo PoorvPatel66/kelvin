@@ -20,6 +20,7 @@ import {
   Building2
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useSiteConfiguration } from '../../context/SiteConfigurationContext.jsx';
 import SEO from '../../components/seo/SEO.jsx';
 import { breadcrumbSchema } from '../../seo/schema.js';
 import { submitContactInquiry, submitQuoteInquiry } from '../../services/inquiryService.js';
@@ -109,6 +110,7 @@ function validateForm(values) {
 function ContactPage() {
   const location = useLocation();
   const { showToast } = useToast();
+  const { settings } = useSiteConfiguration();
   const isQuotePage = location.pathname.includes('request-quote');
   const cmsPage = usePublishedPage('contact');
   const hero = getCmsSection(cmsPage, 'hero', {
@@ -122,6 +124,9 @@ function ContactPage() {
     description: 'Contact Kelvin Eco Products for eco-friendly packaging, export supply, bulk orders, and custom printed packaging quotations.',
     canonicalPath: isQuotePage ? '/request-quote' : '/contact'
   });
+  const headOfficeMapUrl = settings.headOffice ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.headOffice)}` : '#';
+  const corporateOfficeMapUrl = settings.corporateOffice ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.corporateOffice)}` : '#';
+  const websiteUrl = settings.websiteUrl || 'https://kelvinecoproducts.in';
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -312,47 +317,63 @@ function ContactPage() {
             </div>
 
             <div className="contact-info__list">
-              <a href="https://maps.app.goo.gl/ZbKqns2X5JxQJc8Y9" target="_blank" rel="noopener noreferrer">
-                <span className="contact-info__icon"><MapPin size={22} aria-hidden="true" /></span>
-                <span>
-                  <strong>Head Office</strong>
-                  Chappara GIDC, Rajkot - 360024, Gujarat, India
-                </span>
-              </a>
-              <a href="https://www.google.com/maps/search/?api=1&query=71-75%20Shelton%20Street%2C%20Covent%20Garden%2C%20London%2C%20United%20Kingdom%2C%20WC2H%209JQ" target="_blank" rel="noopener noreferrer">
-                <span className="contact-info__icon"><MapPin size={22} aria-hidden="true" /></span>
-                <span>
-                  <strong>Corporate Office</strong>
-                  71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ
-                </span>
-              </a>
-              <a href="tel:+919687503514">
-                <span className="contact-info__icon"><Phone size={22} aria-hidden="true" /></span>
-                <span><strong>Phone Number</strong>+91 9687 503514</span>
-              </a>
-              <a href="tel:+917048503513">
-                <span className="contact-info__icon"><Phone size={22} aria-hidden="true" /></span>
-                <span><strong>Alternate Number</strong>+91 7048 503513</span>
-              </a>
-              <a href="mailto:kelvinecoproducts@gmail.com">
-                <span className="contact-info__icon"><Mail size={22} aria-hidden="true" /></span>
-                <span><strong>Email Address</strong>kelvinecoproducts@gmail.com</span>
-              </a>
-              <a href="mailto:info@kelvinecoproducts.in">
-                <span className="contact-info__icon"><Mail size={22} aria-hidden="true" /></span>
-                <span><strong>Alternate Email Address</strong>info@kelvinecoproducts.in</span>
-              </a>
-              <a href="https://www.kelvinecoproducts.in/" target="_blank" rel="noopener noreferrer">
-                <span className="contact-info__icon"><Globe2 size={22} aria-hidden="true" /></span>
-                <span><strong>Website India</strong>kelvinecoproducts.in</span>
-              </a>
-              <div>
-                <span className="contact-info__icon"><Clock3 size={22} aria-hidden="true" /></span>
-                <span>
-                  <strong>Business Hours</strong>
-                  9:00 AM - 6:00 PM
-                </span>
-              </div>
+              {settings.headOffice && (
+                <a href={headOfficeMapUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="contact-info__icon"><MapPin size={22} aria-hidden="true" /></span>
+                  <span>
+                    <strong>Head Office</strong>
+                    {settings.headOffice}
+                  </span>
+                </a>
+              )}
+              {settings.corporateOffice && (
+                <a href={corporateOfficeMapUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="contact-info__icon"><MapPin size={22} aria-hidden="true" /></span>
+                  <span>
+                    <strong>Corporate Office</strong>
+                    {settings.corporateOffice}
+                  </span>
+                </a>
+              )}
+              {settings.primaryPhone && (
+                <a href={`tel:${settings.primaryPhone.replace(/\s+/g, '')}`}>
+                  <span className="contact-info__icon"><Phone size={22} aria-hidden="true" /></span>
+                  <span><strong>Phone Number</strong>{settings.primaryPhone}</span>
+                </a>
+              )}
+              {settings.alternatePhone && (
+                <a href={`tel:${settings.alternatePhone.replace(/\s+/g, '')}`}>
+                  <span className="contact-info__icon"><Phone size={22} aria-hidden="true" /></span>
+                  <span><strong>Alternate Number</strong>{settings.alternatePhone}</span>
+                </a>
+              )}
+              {settings.primaryEmail && (
+                <a href={`mailto:${settings.primaryEmail}`}>
+                  <span className="contact-info__icon"><Mail size={22} aria-hidden="true" /></span>
+                  <span><strong>Email Address</strong>{settings.primaryEmail}</span>
+                </a>
+              )}
+              {settings.alternateEmail && (
+                <a href={`mailto:${settings.alternateEmail}`}>
+                  <span className="contact-info__icon"><Mail size={22} aria-hidden="true" /></span>
+                  <span><strong>Alternate Email Address</strong>{settings.alternateEmail}</span>
+                </a>
+              )}
+              {websiteUrl && (
+                <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="contact-info__icon"><Globe2 size={22} aria-hidden="true" /></span>
+                  <span><strong>Website</strong>{String(websiteUrl).replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                </a>
+              )}
+              {settings.businessHours && (
+                <div>
+                  <span className="contact-info__icon"><Clock3 size={22} aria-hidden="true" /></span>
+                  <span>
+                    <strong>Business Hours</strong>
+                    {settings.businessHours}
+                  </span>
+                </div>
+              )}
             </div>
           </aside>
 
@@ -363,14 +384,14 @@ function ContactPage() {
             <div className="contact-map__panel">
               <MapPin size={28} aria-hidden="true" />
               <h2 id="find-us-title">Find Us</h2>
-              <p>We are located in the heart of Rajkot, Gujarat. You can visit us anytime during business hours.</p>
-              <a className="contact-map__button" href="https://maps.app.goo.gl/ZbKqns2X5JxQJc8Y9" target="_blank" rel="noopener noreferrer">
+              <p>{settings.headOffice ? `Visit us at ${settings.headOffice}.` : 'Visit us during business hours to discuss your packaging requirements.'}</p>
+              <a className="contact-map__button" href={headOfficeMapUrl || '#'} target="_blank" rel="noopener noreferrer">
                 Get Directions <ArrowRight size={16} aria-hidden="true" />
               </a>
             </div>
             <iframe
-              title="Kelvin Eco Products location map"
-              src="https://maps.google.com/maps?q=Kelvin%20Eco%20Products%2C%20Chhapra%2C%20Rajkot%2C%20Gujarat&t=k&z=14&ie=UTF8&iwloc=&output=embed"
+              title={`${settings.siteName || 'Kelvin Eco Products'} location map`}
+              src={settings.headOffice ? `https://maps.google.com/maps?q=${encodeURIComponent(settings.headOffice)}&t=k&z=14&ie=UTF8&iwloc=&output=embed` : 'https://maps.google.com/maps?q=Rajkot%20Gujarat&t=k&z=12&ie=UTF8&iwloc=&output=embed'}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />

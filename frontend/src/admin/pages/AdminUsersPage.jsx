@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edit3, Plus, RefreshCw, UserX, X } from 'lucide-react';
 import DataTable from '../components/DataTable.jsx';
 import PageHeader from '../components/PageHeader.jsx';
@@ -20,7 +20,7 @@ function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  async function load(term = search) {
+  const load = useCallback(async (term = search) => {
     try {
       setIsLoading(true);
       const data = await fetchAdminUsers({ search: term || undefined });
@@ -31,9 +31,9 @@ function AdminUsersPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [search, showToast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   function resetForm() { setEditingId(null); setForm(emptyForm); }
 
@@ -61,7 +61,7 @@ function AdminUsersPage() {
     }
   }
 
-  async function deactivate(user) {
+  const deactivate = useCallback(async (user) => {
     if (!window.confirm(`Deactivate ${user.name}?`)) return;
     try {
       await deactivateAdminUser(user.id);
@@ -70,7 +70,7 @@ function AdminUsersPage() {
     } catch (error) {
       showToast({ type: 'error', message: error.response?.data?.message || 'Unable to deactivate user.' });
     }
-  }
+  }, [load, showToast]);
 
   const columns = useMemo(() => [
     { key: 'name', header: 'User', render: (user) => <div className="admin-ops-primary-cell"><strong>{user.name}</strong><span>{user.email}</span></div> },
@@ -78,7 +78,7 @@ function AdminUsersPage() {
     { key: 'mobile', header: 'Mobile', render: (user) => user.mobile || '-' },
     { key: 'isActive', header: 'Access', render: (user) => <StatusBadge status={user.isActive ? 'ACTIVE' : 'INACTIVE'} /> },
     { key: 'actions', header: 'Actions', render: (user) => <div className="admin-row-actions"><button type="button" onClick={() => editUser(user)} aria-label={`Edit ${user.name}`}><Edit3 size={16} /></button>{user.isActive && <button type="button" onClick={() => deactivate(user)} aria-label={`Deactivate ${user.name}`}><UserX size={16} /></button>}</div> }
-  ], []);
+  ], [deactivate]);
 
   return <main className="admin-content admin-ops-page">
     <PageHeader eyebrow="Security" title="Admin Users" description="Create role-based admin accounts and control access to the CMS." actions={<button className="admin-btn" type="button" onClick={() => load()}><RefreshCw size={17} />Refresh</button>} />

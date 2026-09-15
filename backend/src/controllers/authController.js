@@ -80,7 +80,12 @@ export const login = asyncHandler(async (req, res) => {
     throw new AppError('Invalid email or password.', 401);
   }
 
-  sendAuthResponse(res, 200, admin);
+  const authenticatedAdmin = await prisma.admin.update({
+    where: { id: admin.id },
+    data: { lastLoginAt: new Date() }
+  });
+
+  sendAuthResponse(res, 200, authenticatedAdmin);
 });
 
 export const requestOwnerOtp = asyncHandler(async (req, res) => {

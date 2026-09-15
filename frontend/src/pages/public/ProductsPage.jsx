@@ -22,6 +22,7 @@ import { productCatalog } from '../../data/productCatalog.js';
 import { siteImages } from '../../data/siteImages.js';
 import { fetchProducts } from '../../services/productService.js';
 import { normalizeProductForDisplay } from '../../utils/productDisplay.js';
+import { useSiteConfiguration } from '../../context/SiteConfigurationContext.jsx';
 import './ProductsPage.css';
 
 const categoryHighlights = [
@@ -162,6 +163,7 @@ const getDetailCards = (productItem) => [
 ];
 
 function ProductsPage() {
+  const { settings } = useSiteConfiguration();
   const cmsPage = usePublishedPage('products');
   const customizeCmsPage = usePublishedPage('customize');
   const cmsHero = getCmsSection(cmsPage, 'hero', {
@@ -419,8 +421,8 @@ function ProductsPage() {
                 </Link>
                 <a
                   className="product-modal__whatsapp"
-                  href={`https://wa.me/919687503514?text=${encodeURIComponent(
-                    `Hello Kelvin Eco Products, please send me details and pricing list for ${activeProduct.title}.`
+                  href={`https://wa.me/${settings.whatsappNumber || '919687503514'}?text=${encodeURIComponent(
+                    `Hello ${settings.siteName || 'Kelvin Eco Products'}, please send me details and pricing list for ${activeProduct.title}.`
                   )}`}
                   target="_blank"
                   rel="noreferrer"

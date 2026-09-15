@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LockKeyhole, Phone, ShieldCheck, UserRound } from 'lucide-react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { LockKeyhole, Mail, Phone, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import SEO from '../../components/seo/SEO.jsx';
@@ -8,6 +8,7 @@ import { requestOwnerOtp } from '../../services/authService.js';
 import './AdminLoginPage.css';
 
 const initialForm = {
+  email: '',
   ownerName: '',
   mobile: '',
   password: '',
@@ -17,10 +18,11 @@ const initialForm = {
 function AdminLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, loginWithOwnerOtp } = useAuth();
+  const { isAuthenticated, login, loginWithOwnerOtp } = useAuth();
   const { showToast } = useToast();
   const [form, setForm] = useState(initialForm);
   const [otpRequested, setOtpRequested] = useState(false);
+  const [loginMode, setLoginMode] = useState('password');
   const [developmentOtp, setDevelopmentOtp] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -55,6 +57,35 @@ function AdminLoginPage() {
       showToast({ type: 'success', message: response.message || 'Verification code sent.' });
     } catch (apiError) {
       const message = apiError.response?.data?.message || 'Invalid owner credentials.';
+      setError(message);
+      showToast({ type: 'error', message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handlePasswordLogin(event) {
+    event.preventDefault();
+
+    const email = form.email.trim();
+
+    if (!email || !form.password) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Enter a valid admin email address.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await login({ email, password: form.password });
+      showToast({ type: 'success', message: 'Welcome back.' });
+      navigate(location.state?.from?.pathname || '/admin', { replace: true });
+    } catch (apiError) {
+      const message = apiError.response?.data?.message || 'Invalid email or password.';
       setError(message);
       showToast({ type: 'error', message });
     } finally {
@@ -101,34 +132,35 @@ function AdminLoginPage() {
 
         <form
           className="admin-login__form"
-          onSubmit={otpRequested ? handleVerifyOtp : handleRequestOtp}
+          onSubmit={loginMode === 'password' ? handlePasswordLogin : otpRequested ? handleVerifyOtp : handleRequestOtp}
           noValidate
         >
           <span className="admin-login__lock">
             <LockKeyhole size={24} aria-hidden="true" />
           </span>
-          <span className="admin-login__eyebrow">Owner Verification</span>
-          <h2>Admin OTP Login</h2>
-          <p>Enter owner details, request OTP, then verify to open the dashboard.</p>
+          <span className="admin-login__eyebrow">Admin Access</span>
+          <h2>{loginMode === 'password' ? 'Sign in' : 'Owner OTP Login'}</h2>
+          <p>{loginMode === 'password' ? 'Use your admin email and password to continue.' : 'Enter owner details, request OTP, then verify to open the dashboard.'}</p>
 
-          <label>
-            Owner Name
-            <span className="admin-login__input">
-              <UserRound size={17} aria-hidden="true" />
-              <input
-                id="admin-owner-name"
-                name="ownerName"
-                type="text"
-                value={form.ownerName}
-                onChange={handleChange}
-                autoComplete="name"
-                placeholder="vasu poorv"
-                disabled={otpRequested}
-              />
-            </span>
-          </label>
+          {loginMode === 'password' ? (
+            <label>
+              Admin email
+              <span className="admin-login__input">
+                <Mail size={17} aria-hidden="true" />
+                <input id="admin-email" name="email" type="email" value={form.email} onChange={handleChange} autoComplete="email" placeholder="admin@example.com" />
+              </span>
+            </label>
+          ) : (
+            <label>
+              Owner Name
+              <span className="admin-login__input">
+                <UserRound size={17} aria-hidden="true" />
+                <input id="admin-owner-name" name="ownerName" type="text" value={form.ownerName} onChange={handleChange} autoComplete="name" placeholder="Owner name" disabled={otpRequested} />
+              </span>
+            </label>
+          )}
 
-          <label>
+          {loginMode === 'otp' && <label>
             Mobile Number
             <span className="admin-login__input">
               <Phone size={17} aria-hidden="true" />
@@ -143,7 +175,7 @@ function AdminLoginPage() {
                 disabled={otpRequested}
               />
             </span>
-          </label>
+          </label>}
 
           <label>
             Admin Password
@@ -162,7 +194,7 @@ function AdminLoginPage() {
             </span>
           </label>
 
-          {otpRequested && (
+          {loginMode === 'otp' && otpRequested && (
             <label>
               OTP
               <span className="admin-login__input">
@@ -191,10 +223,10 @@ function AdminLoginPage() {
           )}
 
           <button className="admin-login__submit" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Please wait...' : otpRequested ? 'Verify OTP & Sign In' : 'Request OTP'}
+            {isSubmitting ? 'Please wait...' : loginMode === 'password' ? 'Sign in' : otpRequested ? 'Verify OTP & Sign In' : 'Request OTP'}
           </button>
 
-          {otpRequested && (
+          {loginMode === 'otp' && otpRequested && (
             <button
               className="admin-login__reset"
               type="button"
@@ -208,6 +240,19 @@ function AdminLoginPage() {
               Change owner details
             </button>
           )}
+          {loginMode === 'password' && <Link className="admin-login__link" to="/admin/forgot-password">Forgot password?</Link>}
+          <button
+            className="admin-login__reset"
+            type="button"
+            onClick={() => {
+              setLoginMode((current) => (current === 'password' ? 'otp' : 'password'));
+              setOtpRequested(false);
+              setDevelopmentOtp('');
+              setError('');
+            }}
+          >
+            {loginMode === 'password' ? 'Use owner OTP instead' : 'Use email and password instead'}
+          </button>
         </form>
       </section>
     </main>

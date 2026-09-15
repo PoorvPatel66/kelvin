@@ -35,3 +35,16 @@ export async function getCurrentAdmin() {
   const response = await api.get('/auth/me');
   return response.data?.user || response.data?.admin || response.data?.data;
 }
+
+export async function requestPasswordReset(email) {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+}
+
+export async function resetPassword(payload) {
+  const response = await api.post('/auth/reset-password', payload);
+  const token = response.data?.token;
+
+  setStoredToken(token);
+  return response.data;
+}

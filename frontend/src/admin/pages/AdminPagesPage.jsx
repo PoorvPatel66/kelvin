@@ -67,7 +67,7 @@ function buildPagePayload(formData) {
   };
 }
 
-function AdminPagesPage() {
+function AdminPagesPage({ pageKey = '' }) {
   const { showToast } = useToast();
   const [pages, setPages] = useState([]);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalProducts: 0 });
@@ -80,13 +80,16 @@ function AdminPagesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
+  const initialForm = pageKey ? { ...emptyForm, pageKey } : emptyForm;
+
   const loadPages = useCallback(async (nextPage, nextSearch) => {
     try {
       setIsLoading(true);
       const data = await fetchAdminPages({
         page: nextPage,
         limit: 10,
-        search: nextSearch || undefined
+        search: nextSearch || undefined,
+        pageKey: pageKey || undefined
       });
 
       setPages(data.pages);
@@ -96,7 +99,7 @@ function AdminPagesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [showToast]);
+  }, [pageKey, showToast]);
 
   useEffect(() => {
     loadPages(page, search);
@@ -104,7 +107,7 @@ function AdminPagesPage() {
 
   function resetForm() {
     setEditingId(null);
-    setFormData(emptyForm);
+    setFormData(initialForm);
     setSectionsJson('{}');
     setSectionsJsonError('');
   }
@@ -206,7 +209,7 @@ function AdminPagesPage() {
     setFormData({
       title: pageRecord.title || '',
       slug: pageRecord.slug || '',
-      pageKey: pageRecord.pageKey || '',
+      pageKey: pageKey || pageRecord.pageKey || '',
       status: pageRecord.status || 'DRAFT',
       excerpt: pageRecord.excerpt || '',
       content: pageRecord.content || '',
@@ -341,9 +344,9 @@ function AdminPagesPage() {
   return (
     <main className="admin-content admin-pages-page">
       <PageHeader
-        eyebrow="Website"
-        title="Pages"
-        description="Edit published website copy and SEO using structured fields tied to each public page."
+        eyebrow={pageKey ? 'About' : 'Website'}
+        title={pageKey ? 'About' : 'Pages'}
+        description={pageKey ? 'Update the company story, mission, vision, and public About page content.' : 'Edit published website copy and SEO using structured fields tied to each public page.'}
         actions={
           <button className="admin-btn" type="button" onClick={() => loadPages(page, search)}>
             <RefreshCw size={18} aria-hidden="true" />
@@ -374,7 +377,7 @@ function AdminPagesPage() {
             Slug
             <input name="slug" value={formData.slug} onChange={handleChange} required />
           </label>
-          <label>
+            {!pageKey && <label>
             Page key
             <select name="pageKey" value={formData.pageKey} onChange={handlePageKeyChange}>
               <option value="">Select website page</option>
@@ -382,7 +385,7 @@ function AdminPagesPage() {
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-          </label>
+            </label>}
           <label>
             Status
             <select name="status" value={formData.status} onChange={handleChange}>

@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { UploadCloud } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Trash2, UploadCloud } from 'lucide-react';
 import EmptyState from '../components/EmptyState.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
-import { uploadAdminMediaAsset } from '../../services/adminMediaService.js';
+import { deleteAdminMediaAsset, fetchAdminMediaAssets, uploadAdminMediaAsset } from '../../services/adminMediaService.js';
 import './AdminMediaPage.css';
 
 const mediaTypes = ['ABOUT_IMAGE', 'DOWNLOAD', 'HERO_BANNER'];
@@ -13,7 +13,27 @@ function AdminMediaPage() {
   const [form, setForm] = useState({ title: '', type: 'ABOUT_IMAGE' });
   const [file, setFile] = useState(null);
   const [uploadedAssets, setUploadedAssets] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchAdminMediaAssets()
+      .then((assets) => {
+        if (isMounted) setUploadedAssets(assets);
+      })
+      .catch((error) => {
+        showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load media assets.' });
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [showToast]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -44,6 +64,18 @@ function AdminMediaPage() {
       showToast({ type: 'error', message: error.response?.data?.message || 'Unable to upload media.' });
     } finally {
       setIsUploading(false);
+    }
+  }
+
+  async function handleDelete(asset) {
+    if (!window.confirm(`Delete "${asset.title || 'this asset'}"?`)) return;
+
+    try {
+      await deleteAdminMediaAsset(asset.id);
+      setUploadedAssets((current) => current.filter((item) => item.id !== asset.id));
+      showToast({ type: 'success', message: 'Media asset deleted.' });
+    } catch (error) {
+      showToast({ type: 'error', message: error.response?.data?.message || 'Unable to delete media asset.' });
     }
   }
 
@@ -87,19 +119,24 @@ function AdminMediaPage() {
         </form>
 
         <section className="admin-media-list">
-          {uploadedAssets.length === 0 ? (
+          {isLoading ? (
+            <p className="admin-media-list__empty">Loading media assets...</p>
+          ) : uploadedAssets.length === 0 ? (
             <EmptyState
-              title="Media list endpoint pending"
-              description="Uploaded assets will appear here during this session. A persistent media browser requires adding a protected GET /admin/media endpoint."
+              title="No media assets found"
+              description="Upload an image or downloadable asset to build the reusable media library."
             />
           ) : (
             uploadedAssets.map((asset) => (
               <article className="admin-media-item" key={asset.id || asset.url || asset.publicId}>
                 {asset.url && <img src={asset.url} alt={asset.title || 'Uploaded media'} loading="lazy" decoding="async" />}
                 <div>
-                  <strong>{asset.title || form.title}</strong>
+                  <strong>{asset.title || 'Untitled asset'}</strong>
                   <span>{asset.type || 'MEDIA'}</span>
                 </div>
+                <button type="button" onClick={() => handleDelete(asset)} aria-label={`Delete ${asset.title || 'media asset'}`}>
+                  <Trash2 size={16} />
+                </button>
               </article>
             ))
           )}

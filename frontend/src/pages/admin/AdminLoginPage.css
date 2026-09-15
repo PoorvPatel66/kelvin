@@ -98,6 +98,13 @@
   padding: 46px;
 }
 
+.admin-login__form.admin-login__panel {
+  width: min(520px, 100%);
+  min-height: 0;
+  display: flex;
+  grid-template-columns: none;
+}
+
 .admin-login__lock {
   width: 56px;
   height: 56px;
@@ -200,6 +207,15 @@
 .admin-login__reset:hover {
   border-color: #2e7d32;
   background: rgba(46, 125, 50, 0.08);
+}
+
+.admin-login__link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #2e7d32;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
 }
 
 @media (max-width: 860px) {

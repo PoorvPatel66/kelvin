@@ -14,6 +14,7 @@ import {
   uploadMediaAsset,
   uploadProductImages
 } from '../controllers/mediaController.js';
+import { getMediaAssets } from '../controllers/mediaController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { requirePermission } from '../middleware/permissionMiddleware.js';
 import { multipleImageUpload, singleImageUpload } from '../middleware/uploadMiddleware.js';
@@ -32,6 +33,8 @@ import {
 const router = express.Router();
 
 router.use(protect, requirePermission('website.manage'));
+
+router.get('/assets', getMediaAssets);
 
 router.post(
   '/product/upload',

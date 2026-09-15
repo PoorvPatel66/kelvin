@@ -18,6 +18,10 @@ function buildPageWhere(query = {}) {
     where.status = query.status;
   }
 
+  if (query.pageKey) {
+    where.pageKey = query.pageKey.trim().toLowerCase();
+  }
+
   if (query.search) {
     where.OR = [
       { title: { contains: query.search, mode: 'insensitive' } },

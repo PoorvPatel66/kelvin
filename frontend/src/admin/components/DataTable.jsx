@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import EmptyState from './EmptyState.jsx';
 import './DataTable.css';
 
@@ -40,12 +40,7 @@ function DataTable({
             placeholder="Search records..."
           />
         </label>
-        {toolbarActions || (
-          <button className="admin-table-card__filter" type="button" disabled>
-            <SlidersHorizontal size={17} aria-hidden="true" />
-            Filters
-          </button>
-        )}
+        {toolbarActions}
       </div>
 
       {isLoading ? (

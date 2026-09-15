@@ -19,6 +19,18 @@ const folders = {
   downloads: 'kelvin/downloads'
 };
 
+export const getMediaAssets = asyncHandler(async (req, res) => {
+  const assets = await prisma.mediaAsset.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 200
+  });
+
+  res.status(200).json({
+    success: true,
+    assets: assets.map(withTransformations)
+  });
+});
+
 function withTransformations(asset) {
   return {
     ...asset,

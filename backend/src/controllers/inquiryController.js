@@ -251,6 +251,25 @@ export const updateInquiryStatus = asyncHandler(async (req, res) => {
   });
 });
 
+export const deleteInquiry = asyncHandler(async (req, res) => {
+  try {
+    await prisma.inquiry.delete({
+      where: { id: req.params.id }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Inquiry deleted.'
+    });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      throw new AppError('Inquiry not found.', 404);
+    }
+
+    throw error;
+  }
+});
+
 export const addInquiryNote = asyncHandler(async (req, res) => {
   const inquiry = await prisma.inquiry.findUnique({
     where: { id: req.params.id }

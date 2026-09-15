@@ -24,6 +24,16 @@ export async function updateAdminInquiryStatus(id, status) {
   return response.data?.inquiry || response.data?.data?.inquiry;
 }
 
+export async function fetchAdminInquiry(id) {
+  const response = await api.get(`/inquiries/${id}`);
+  return response.data?.inquiry || response.data?.data?.inquiry;
+}
+
+export async function deleteAdminInquiry(id) {
+  const response = await api.delete(`/inquiries/${id}`);
+  return response.data;
+}
+
 export async function addAdminInquiryNote(id, message) {
   const response = await api.post(`/inquiries/${id}/notes`, { message });
   return response.data?.note || response.data?.data?.note;

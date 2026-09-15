@@ -7,6 +7,7 @@ import {
   createNewsletterInquiry,
   createQuoteInquiry,
   createWhatsAppInquiry,
+  deleteInquiry,
   exportInquiriesCsv,
   getInquiries,
   getInquiryById,
@@ -46,6 +47,7 @@ router.get('/dashboard', getInquiryDashboard);
 router.get('/export.csv', inquiryListValidator, validateRequest, exportInquiriesCsv);
 router.get('/:id', inquiryIdValidator, validateRequest, getInquiryById);
 router.patch('/:id/status', inquiryStatusValidator, validateRequest, updateInquiryStatus);
+router.delete('/:id', inquiryIdValidator, validateRequest, deleteInquiry);
 router.post('/:id/notes', inquiryNoteValidator, validateRequest, addInquiryNote);
 router.post('/:id/resend-notification', inquiryIdValidator, validateRequest, resendInquiryNotification);
 

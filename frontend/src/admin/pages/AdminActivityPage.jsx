@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import DataTable from '../components/DataTable.jsx';
 import PageHeader from '../components/PageHeader.jsx';
@@ -13,7 +13,7 @@ function AdminActivityPage() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  async function load(page = 1, term = search) {
+  const load = useCallback(async (page = 1, term = search) => {
     try {
       setIsLoading(true);
       const data = await fetchActivityLogs({ page, limit: 25, search: term || undefined });
@@ -24,9 +24,9 @@ function AdminActivityPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [search, showToast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const columns = useMemo(() => [
     { key: 'createdAt', header: 'Time', render: (row) => new Date(row.createdAt).toLocaleString() },

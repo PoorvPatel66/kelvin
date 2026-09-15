@@ -180,6 +180,19 @@ function AboutPage() {
     heading: 'Packaging Built for Modern Businesses.',
     description: 'Kelvin Eco Products is a B2B eco-friendly packaging manufacturer focused on helping restaurants, cafes, coffee chains, distributors, importers, and food brands package products with confidence. We supply paper cups, containers, pizza boxes, salad bowls, tea flasks, lids, meal boxes, spout pouches, and custom printed packaging.'
   });
+  const story = getCmsSection(cmsPage, 'story', {
+    heading: 'From an Idea to a Growing Packaging Brand.',
+    paragraphOne: 'Kelvin Eco Products was shaped around a practical business need: food packaging should be dependable, brand-ready, and more responsible.',
+    paragraphTwo: 'Today, our direction remains clear. We focus on food-grade quality, modern product presentation, repeat bulk supply, and packaging solutions that help businesses choose better materials.',
+    quote: 'Think Green. Pack Smart.'
+  });
+  const mission = getCmsSection(cmsPage, 'mission', drivers[0].text);
+  const vision = getCmsSection(cmsPage, 'vision', drivers[1].text);
+  const aboutDrivers = drivers.map((item) => item.title === 'Mission'
+    ? { ...item, text: typeof mission === 'string' ? mission : mission.text || item.text }
+    : item.title === 'Vision'
+      ? { ...item, text: typeof vision === 'string' ? vision : vision.text || item.text }
+      : item);
   const seo = getCmsSeo(cmsPage, {
     title: 'About Kelvin Eco Products',
     description: 'Kelvin Eco Products manufactures eco-friendly food packaging for restaurants, distributors, importers, and global food businesses.',
@@ -259,20 +272,15 @@ function AboutPage() {
             <motion.div className={styles.storyCopy} variants={reveal}>
               <span className={styles.eyebrow}>03 / Our Story</span>
               <h2 id="story-title">
-                From an Idea to a <span>Growing Packaging Brand.</span>
+                {story.heading}
               </h2>
               <p>
-                Kelvin Eco Products was shaped around a practical business need: food packaging
-                should be dependable, brand-ready, and more responsible. The company grew by
-                listening to buyers, understanding product applications, and building a catalogue
-                that supports real food-service operations.
+                {story.paragraphOne}
               </p>
               <p>
-                Today, our direction remains clear. We focus on food-grade quality, modern product
-                presentation, repeat bulk supply, and packaging solutions that help businesses look
-                sharper while choosing better materials.
+                {story.paragraphTwo}
               </p>
-              <blockquote>Think Green. Pack Smart.</blockquote>
+              <blockquote>{story.quote}</blockquote>
             </motion.div>
 
             <motion.div className={styles.storyImages} variants={stagger}>
@@ -320,7 +328,7 @@ function AboutPage() {
           </motion.div>
 
           <motion.div className={styles.driverGrid} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
-            {drivers.map((item) => {
+            {aboutDrivers.map((item) => {
               const Icon = item.icon;
 
               return (

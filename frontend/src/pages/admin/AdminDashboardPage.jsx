@@ -36,12 +36,15 @@ function AdminDashboardPage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [visitors, setVisitors] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadError, setHasLoadError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadDashboard() {
       try {
+        setHasLoadError(false);
         const [summaryData, monthlyData, inquiryData, blogData, productData, visitorData] = await Promise.allSettled([
           fetchDashboardSummary(),
           fetchMonthlyInquiries(currentYear),
@@ -65,6 +68,7 @@ function AdminDashboardPage() {
         );
 
         if (hasRejected) {
+          setHasLoadError(true);
           showToast({ type: 'error', message: 'Some dashboard widgets could not be loaded.' });
         }
       } finally {
@@ -79,7 +83,7 @@ function AdminDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [currentYear, showToast]);
+  }, [currentYear, retryKey, showToast]);
 
   const maxMonthlyCount = useMemo(() => Math.max(...monthly.map((item) => item.count), 1), [monthly]);
 
@@ -204,6 +208,18 @@ function AdminDashboardPage() {
               </div>
             </article>
           </section>
+          {hasLoadError && (
+            <div className="admin-dashboard__error" role="alert">
+              <span>Some dashboard data could not be loaded.</span>
+              <button
+                className="admin-btn"
+                type="button"
+                onClick={() => setRetryKey((value) => value + 1)}
+              >
+                Retry
+              </button>
+            </div>
+          )}
         </>
       )}
     </main>

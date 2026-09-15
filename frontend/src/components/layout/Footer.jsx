@@ -123,40 +123,48 @@ function Footer() {
         <motion.div className="site-footer__column site-footer__contact" variants={itemVariants}>
           <h2>Contact Us</h2>
           <ul>
-            <li>
-              <a href={`tel:${settings.primaryPhone}`}>
-                <Phone size={18} />
-                <span>{settings.primaryPhone}</span>
-              </a>
-              <a href={`tel:${settings.alternatePhone}`}>
-                <Phone size={18} />
-                <span>{settings.alternatePhone}</span>
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${settings.primaryEmail}`}>
-                <Mail size={18} />
-                <span>{settings.primaryEmail}</span>
-              </a>
-            </li>
-            <li>
-              <a href={settings.websiteUrl} target="_blank" rel="noopener noreferrer">
-                <Globe size={18} />
-                <span>{String(settings.websiteUrl || '').replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-              </a>
-            </li>
-            <li>
-              <span>
-                <a href={mapUrl} target="_blank" rel="noopener noreferrer">
-                  <MapPin size={18} />
-                  <span>Head Office, <br/>{settings.headOffice}</span>
+            {settings.primaryPhone && (
+              <li>
+                <a href={`tel:${settings.primaryPhone}`}>
+                  <Phone size={18} />
+                  <span>{settings.primaryPhone}</span>
                 </a>
-                {/* <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
-                  <MapPin size={18} />
-                  <span>Corporate Office, <br/>71-75, Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ, United Kingdom</span>
-                </a> */}
-              </span>
-            </li>
+              </li>
+            )}
+            {settings.alternatePhone && (
+              <li>
+                <a href={`tel:${settings.alternatePhone}`}>
+                  <Phone size={18} />
+                  <span>{settings.alternatePhone}</span>
+                </a>
+              </li>
+            )}
+            {settings.primaryEmail && (
+              <li>
+                <a href={`mailto:${settings.primaryEmail}`}>
+                  <Mail size={18} />
+                  <span>{settings.primaryEmail}</span>
+                </a>
+              </li>
+            )}
+            {settings.websiteUrl && (
+              <li>
+                <a href={settings.websiteUrl} target="_blank" rel="noopener noreferrer">
+                  <Globe size={18} />
+                  <span>{String(settings.websiteUrl || '').replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                </a>
+              </li>
+            )}
+            {settings.headOffice && (
+              <li>
+                <span>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer">
+                    <MapPin size={18} />
+                    <span>Head Office, <br/>{settings.headOffice}</span>
+                  </a>
+                </span>
+              </li>
+            )}
           </ul>
         </motion.div>
       </motion.div>
